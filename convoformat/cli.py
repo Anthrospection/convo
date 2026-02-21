@@ -4,9 +4,42 @@ import sys
 from pathlib import Path
 
 import click
+import yaml
 
 from convoformat import __version__
 from convoformat.parser import Turn, detect_date, detect_title, parse
+from convoformat.references import Reference, collect_references
+
+_CONFIG_PATHS = [
+    Path.home() / ".config" / "convoformat" / "config.yaml",
+    Path.home() / ".convoformat.yaml",
+]
+
+
+_CONFIG_KEY_MAP = {
+    "assistant": "assistant_label",
+    "user": "user_label",
+    "output": "fmt",
+}
+
+
+def _load_config() -> dict:
+    """Load config from the first existing config file.
+
+    Config keys use the friendly CLI names (assistant, user, output).
+    They're mapped to click parameter names internally.
+    """
+    for path in _CONFIG_PATHS:
+        if path.exists():
+            try:
+                with open(path) as f:
+                    raw = yaml.safe_load(f)
+                if not isinstance(raw, dict):
+                    return {}
+                return {_CONFIG_KEY_MAP.get(k, k): v for k, v in raw.items()}
+            except Exception:
+                return {}
+    return {}
 
 _FORMAT_EXTENSIONS = {
     "pdf": ".pdf",
@@ -50,22 +83,23 @@ def _render(
     date: str,
     assistant_label: str,
     user_label: str,
+    references: list[Reference] | None = None,
 ) -> None:
     if fmt == "pdf":
         from convoformat.renderers.pdf import render_pdf
-        render_pdf(turns, output_path, theme, mobile, title, date, assistant_label, user_label)
+        render_pdf(turns, output_path, theme, mobile, title, date, assistant_label, user_label, references=references)
     elif fmt == "html":
         from convoformat.renderers.html import render_html
-        render_html(turns, output_path, theme, mobile, title, date, assistant_label, user_label)
+        render_html(turns, output_path, theme, mobile, title, date, assistant_label, user_label, references=references)
     elif fmt == "markdown":
         from convoformat.renderers.markdown import render_markdown
-        render_markdown(turns, output_path, title, date)
+        render_markdown(turns, output_path, title, date, references=references)
     elif fmt == "text":
         from convoformat.renderers.text import render_text
-        render_text(turns, output_path, title, date)
+        render_text(turns, output_path, title, date, references=references)
 
 
-@click.command()
+@click.command(context_settings={"default_map": _load_config()})
 @click.argument("input_file", type=click.Path(exists=True, path_type=Path))
 @click.argument("output_file", type=click.Path(path_type=Path), required=False)
 @click.option(
@@ -98,6 +132,12 @@ def _render(
     show_default=True,
     help="Label for human speaker turns.",
 )
+@click.option(
+    "--ref", "refs",
+    multiple=True,
+    help="Add a reference URL (repeatable). YouTube URLs resolve metadata automatically.",
+)
+@click.option("--no-ai", is_flag=True, help="Skip local model features (title generation).")
 @click.option("--verbose", is_flag=True, help="Include tool calls and scaffolding in output.")
 @click.version_option(__version__, prog_name="convoformat")
 def main(
@@ -111,6 +151,8 @@ def main(
     date: str | None,
     assistant_label: str,
     user_label: str,
+    refs: tuple[str, ...],
+    no_ai: bool,
     verbose: bool,
 ) -> None:
     """Convert a Claude Code conversation transcript to a formatted document.
@@ -138,11 +180,26 @@ def main(
     resolved_title = title or detect_title(input_file, turns, head=head)
     resolved_date = date or detect_date(input_file, head=head)
 
+    # If title is just a filename fallback, try generating one with Ollama
+    stem_title = input_file.stem.replace("_", " ").replace("-", " ").title()
+    if resolved_title == stem_title and turns and not no_ai:
+        from convoformat.titler import generate_title
+        _warn("Generating title with local model...")
+        generated = generate_title(turns)
+        if generated:
+            resolved_title = generated
+            _warn(f"Title: {resolved_title}")
+
     # Apply PII redaction if requested
     if private:
         from convoformat.privacy import print_privacy_warning, redact_turns
         turns, summary = redact_turns(turns, use_presidio=True)
         print_privacy_warning(summary)
+
+    # Collect references (auto-detect from conversation + CLI --ref args)
+    references = collect_references(turns, list(refs) if refs else None)
+    if references:
+        _warn(f"Resolved {len(references)} reference(s)")
 
     output_path = _resolve_output(input_file, output_file, fmt)
     loaded_theme = _load_theme(theme)
@@ -157,6 +214,7 @@ def main(
         date=resolved_date,
         assistant_label=assistant_label,
         user_label=user_label,
+        references=references or None,
     )
 
     click.echo(f"✓ Written to {output_path}")

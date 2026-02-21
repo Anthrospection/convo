@@ -19,6 +19,7 @@ def render_html(
     date: str,
     assistant_label: str,
     user_label: str,
+    references: list | None = None,
 ) -> None:
     """Render turns to a self-contained HTML file."""
     env = Environment(
@@ -35,6 +36,7 @@ def render_html(
         date=date,
         assistant_label=assistant_label,
         user_label=user_label,
+        references=references,
     )
 
     output_path.write_text(html_content, encoding="utf-8")

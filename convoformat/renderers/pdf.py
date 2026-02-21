@@ -101,6 +101,7 @@ def render_pdf(
     date: str,
     assistant_label: str,
     user_label: str,
+    references: list | None = None,
 ) -> None:
     """Render turns to a styled PDF file."""
     pagesize = MOBILE_SIZE if mobile else A4
@@ -167,5 +168,25 @@ def render_pdf(
             story.append(
                 HRFlowable(width="100%", thickness=0.5, color=dim_color, spaceAfter=2)
             )
+
+    # ── References section ──────────────────────────────────────────────────
+    if references:
+        story.append(Spacer(1, 16))
+        story.append(HRFlowable(width="100%", thickness=1, color=hr_color, spaceAfter=12))
+        story.append(Paragraph("References", styles["title"].clone(
+            "CFRefTitle", fontSize=14, leading=18, spaceAfter=8,
+        )))
+        ref_style = _body_style("CFRef", theme.assistant_text, theme.font_body, 9, 13)
+        ref_meta_style = _body_style("CFRefMeta", theme.subtitle_color, theme.font_body, 8, 11)
+        for ref in references:
+            story.append(Paragraph(html.escape(ref.title), ref_style))
+            meta_parts = []
+            if ref.channel:
+                meta_parts.append(ref.channel)
+            if ref.duration:
+                meta_parts.append(ref.duration)
+            meta_parts.append(ref.url)
+            story.append(Paragraph(html.escape(" · ".join(meta_parts)), ref_meta_style))
+            story.append(Spacer(1, 6))
 
     doc.build(story, onFirstPage=bg_draw, onLaterPages=bg_draw)

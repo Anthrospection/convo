@@ -1,8 +1,11 @@
 """Markdown renderer."""
 
+from __future__ import annotations
+
 from pathlib import Path
 
 from convoformat.parser import Turn
+from convoformat.references import Reference
 
 
 def render_markdown(
@@ -10,6 +13,7 @@ def render_markdown(
     output_path: Path,
     title: str,
     date: str,
+    references: list[Reference] | None = None,
 ) -> None:
     """Render turns to a Markdown file suitable for Obsidian."""
     lines: list[str] = []
@@ -36,6 +40,21 @@ def render_markdown(
             lines.append("")
 
         lines.append("---")
+        lines.append("")
+
+    if references:
+        lines.append("## References")
+        lines.append("")
+        for ref in references:
+            parts = [f"- [{ref.title}]({ref.url})"]
+            meta = []
+            if ref.channel:
+                meta.append(ref.channel)
+            if ref.duration:
+                meta.append(ref.duration)
+            if meta:
+                parts.append(f"  *{' · '.join(meta)}*")
+            lines.append("\n".join(parts))
         lines.append("")
 
     output_path.write_text("\n".join(lines), encoding="utf-8")

@@ -89,6 +89,43 @@
       opacity: 0.12;
       margin: 16px 0;
     }
+
+    /* ── References ── */
+    .references {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 2px solid var(--hr-col);
+    }
+
+    .references h2 {
+      color: var(--title-col);
+      font-size: 1.1em;
+      margin-bottom: 12px;
+    }
+
+    .references ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .references li {
+      margin-bottom: 8px;
+    }
+
+    .references a {
+      color: var(--user-label);
+      text-decoration: none;
+    }
+
+    .references a:hover {
+      text-decoration: underline;
+    }
+
+    .ref-meta {
+      color: var(--sub-col);
+      font-size: 0.8em;
+      margin-left: 4px;
+    }
   </style>
 </head>
 <body>
@@ -115,6 +152,26 @@
   </div>
   {% if not loop.last %}<hr class="turn-divider">{% endif %}
   {% endfor %}
+
+  {% if references %}
+  <div class="references">
+    <h2>References</h2>
+    <ul>
+    {% for ref in references %}
+      <li>
+        <a href="{{ ref.url | e }}">{{ ref.title | e }}</a>
+        {% if ref.channel or ref.duration %}
+        <span class="ref-meta">
+          {%- if ref.channel %}{{ ref.channel | e }}{% endif %}
+          {%- if ref.channel and ref.duration %} · {% endif %}
+          {%- if ref.duration %}{{ ref.duration }}{% endif %}
+        </span>
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
 
 </div>
 </body>
