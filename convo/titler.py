@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import subprocess
 
-from convoformat.parser import Turn
+from convo.parser import Turn
 
 _DEFAULT_MODEL = "gemma3:27b"
 

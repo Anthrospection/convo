@@ -2,5 +2,8 @@ __pycache__/
 *.pyc
 .venv/
 .DS_Store
+._*
 output/
 processed/
+input/
+uv.lock

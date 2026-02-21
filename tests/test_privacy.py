@@ -1,11 +1,11 @@
 """Tests for the privacy / PII redaction module."""
 
-from convoformat.parser import Turn
-from convoformat.privacy import _apply_regex, redact_turns
+from convo.parser import Turn
+from convo.privacy import _apply_regex, redact_turns
 
 
 def _turn(text: str, speaker: str = "assistant") -> Turn:
-    return Turn(speaker=speaker, paragraphs=[text], speaker_label="Elliot")
+    return Turn(speaker=speaker, paragraphs=[text], speaker_label="Assistant")
 
 
 # ── Regex layer ───────────────────────────────────────────────────────────────
@@ -82,10 +82,10 @@ class TestRedactTurns:
 
     def test_preserves_speaker_metadata(self):
         turns = [_turn("text", speaker="user")]
-        turns[0] = Turn(speaker="user", paragraphs=["text"], speaker_label="Stacey")
+        turns[0] = Turn(speaker="user", paragraphs=["text"], speaker_label="Alex")
         redacted, _ = redact_turns(turns, use_presidio=False)
         assert redacted[0].speaker == "user"
-        assert redacted[0].speaker_label == "Stacey"
+        assert redacted[0].speaker_label == "Alex"
 
     def test_empty_turns(self):
         redacted, summary = redact_turns([], use_presidio=False)

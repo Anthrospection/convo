@@ -4,8 +4,8 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from convoformat.parser import Turn
-from convoformat.themes import Theme
+from convo.parser import Turn
+from convo.themes import Theme
 
 _TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 
@@ -24,7 +24,7 @@ def render_html(
     """Render turns to a self-contained HTML file."""
     env = Environment(
         loader=FileSystemLoader(str(_TEMPLATES_DIR)),
-        autoescape=False,  # we call | e explicitly in the template
+        autoescape=True,
     )
     template = env.get_template("conversation.html.j2")
 

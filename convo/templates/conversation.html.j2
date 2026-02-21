@@ -6,14 +6,14 @@
   <title>{{ title | e }}</title>
   <style>
     :root {
-      --page-bg:    {{ theme.page_bg }};
-      --asst-label: {{ theme.assistant_label }};
-      --user-label: {{ theme.user_label }};
-      --asst-text:  {{ theme.assistant_text }};
-      --user-text:  {{ theme.user_text }};
-      --title-col:  {{ theme.title_color }};
-      --hr-col:     {{ theme.hr_color }};
-      --sub-col:    {{ theme.subtitle_color }};
+      --page-bg:    {{ theme.page_bg | safe }};
+      --asst-label: {{ theme.assistant_label | safe }};
+      --user-label: {{ theme.user_label | safe }};
+      --asst-text:  {{ theme.assistant_text | safe }};
+      --user-text:  {{ theme.user_text | safe }};
+      --title-col:  {{ theme.title_color | safe }};
+      --hr-col:     {{ theme.hr_color | safe }};
+      --sub-col:    {{ theme.subtitle_color | safe }};
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,13 +22,13 @@
       background-color: var(--page-bg);
       color: var(--asst-text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-      font-size: {{ "17px" if mobile else "15px" }};
+      font-size: {{ ("17px" if mobile else "15px") | safe }};
       line-height: 1.65;
-      padding: {{ "16px" if mobile else "32px" }};
+      padding: {{ ("16px" if mobile else "32px") | safe }};
     }
 
     .container {
-      max-width: {{ "390px" if mobile else "720px" }};
+      max-width: {{ ("390px" if mobile else "720px") | safe }};
       margin: 0 auto;
     }
 

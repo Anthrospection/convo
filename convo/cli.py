@@ -6,13 +6,13 @@ from pathlib import Path
 import click
 import yaml
 
-from convoformat import __version__
-from convoformat.parser import Turn, detect_date, detect_title, parse
-from convoformat.references import Reference, collect_references
+from convo import __version__
+from convo.parser import Turn, detect_date, detect_title, parse
+from convo.references import Reference, collect_references
 
 _CONFIG_PATHS = [
-    Path.home() / ".config" / "convoformat" / "config.yaml",
-    Path.home() / ".convoformat.yaml",
+    Path.home() / ".config" / "convo" / "config.yaml",
+    Path.home() / ".convoformat.yaml",  # legacy fallback
 ]
 
 
@@ -67,9 +67,9 @@ def _resolve_output(input_path: Path, output_path: Path | None, fmt: str) -> Pat
 
 def _load_theme(name: str):
     if name == "dark":
-        from convoformat.themes.dark import DARK
+        from convo.themes.dark import DARK
         return DARK
-    from convoformat.themes.light import LIGHT
+    from convo.themes.light import LIGHT
     return LIGHT
 
 
@@ -86,16 +86,16 @@ def _render(
     references: list[Reference] | None = None,
 ) -> None:
     if fmt == "pdf":
-        from convoformat.renderers.pdf import render_pdf
+        from convo.renderers.pdf import render_pdf
         render_pdf(turns, output_path, theme, mobile, title, date, assistant_label, user_label, references=references)
     elif fmt == "html":
-        from convoformat.renderers.html import render_html
+        from convo.renderers.html import render_html
         render_html(turns, output_path, theme, mobile, title, date, assistant_label, user_label, references=references)
     elif fmt == "markdown":
-        from convoformat.renderers.markdown import render_markdown
+        from convo.renderers.markdown import render_markdown
         render_markdown(turns, output_path, title, date, references=references)
     elif fmt == "text":
-        from convoformat.renderers.text import render_text
+        from convo.renderers.text import render_text
         render_text(turns, output_path, title, date, references=references)
 
 
@@ -139,7 +139,7 @@ def _render(
 )
 @click.option("--no-ai", is_flag=True, help="Skip local model features (title generation).")
 @click.option("--verbose", is_flag=True, help="Include tool calls and scaffolding in output.")
-@click.version_option(__version__, prog_name="convoformat")
+@click.version_option(__version__, prog_name="convo")
 def main(
     input_file: Path,
     output_file: Path | None,
@@ -183,7 +183,7 @@ def main(
     # If title is just a filename fallback, try generating one with Ollama
     stem_title = input_file.stem.replace("_", " ").replace("-", " ").title()
     if resolved_title == stem_title and turns and not no_ai:
-        from convoformat.titler import generate_title
+        from convo.titler import generate_title
         _warn("Generating title with local model...")
         generated = generate_title(turns)
         if generated:
@@ -192,7 +192,7 @@ def main(
 
     # Apply PII redaction if requested
     if private:
-        from convoformat.privacy import print_privacy_warning, redact_turns
+        from convo.privacy import print_privacy_warning, redact_turns
         turns, summary = redact_turns(turns, use_presidio=True)
         print_privacy_warning(summary)
 

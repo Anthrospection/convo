@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from convoformat.parser import Turn, _classify, _paragraphize, detect_date, detect_title, parse
-from convoformat.parser import LineType
+from convo.parser import Turn, _classify, _paragraphize, detect_date, detect_title, parse
+from convo.parser import LineType
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_conversation.txt"
 
@@ -126,12 +126,12 @@ class TestParse:
                 assert turn.speaker_label == "Assistant"
 
     def test_custom_labels(self):
-        turns = parse(FIXTURE, assistant_label="Elliot", user_label="Stacey")
+        turns = parse(FIXTURE, assistant_label="Claude", user_label="Alex")
         for turn in turns:
             if turn.speaker == "user":
-                assert turn.speaker_label == "Stacey"
+                assert turn.speaker_label == "Alex"
             else:
-                assert turn.speaker_label == "Elliot"
+                assert turn.speaker_label == "Claude"
 
     def test_verbose_includes_tool_calls(self):
         turns_normal = parse(FIXTURE, verbose=False)

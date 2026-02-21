@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from convoformat.parser import Turn
-from convoformat.references import Reference
+from convo.parser import Turn
+from convo.references import Reference
 
 
 def render_text(

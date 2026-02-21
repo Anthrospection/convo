@@ -1,0 +1,39 @@
+╭────────────────────────────────────────────╮
+│ ✻ Claude Code                    /home/user │
+│   Model: claude-opus-4-6                    │
+╰────────────────────────────────────────────╯
+
+❯ I just watched this talk about energy-based models — https://www.youtube.com/watch?v=rvwBsWDOFIE — and I'm trying to understand how they differ from transformers.
+
+● That's a fascinating topic. Energy-based models and transformers approach reasoning from fundamentally different directions.
+
+Transformers process everything sequentially through tokens — they predict the next token, chain of thought, step by step. It's inherently linguistic. Even when solving math or logic puzzles, the transformer is converting the problem into language and reasoning through text.
+
+Energy-based models (EBMs) work differently. They define an energy landscape over possible solutions and then find the minimum energy state. There's no token generation, no sequential reasoning. The model evaluates configurations and settles into the answer like a ball rolling downhill.
+
+The practical difference shows up in speed. An EBM can solve a constraint satisfaction problem in milliseconds because it's evaluating the entire solution space simultaneously. A transformer has to reason through it token by token.
+
+❯ So the EBM doesn't "think" in language at all?
+
+● Right. The key insight is that intelligence — at least certain kinds of it — doesn't require language as a medium. Language is an interface for communicating intelligence, not the substrate of intelligence itself.
+
+Think about how you solve a jigsaw puzzle. You don't narrate it to yourself: "This piece has a blue edge, which matches the sky region..." You just see the shape, feel the fit, rotate and try. That's spatial reasoning happening without language.
+
+EBMs capture that kind of reasoning. They're especially good at:
+- Constraint satisfaction (Sudoku, scheduling)
+- Spatial reasoning (geometry, physics simulation)
+- Pattern completion (where the answer is a configuration, not a sequence)
+
+The limitation is that they struggle with open-ended generation — writing prose, having conversations, explaining their reasoning. That's where language models excel.
+
+❯ So the future is probably both working together?
+
+● Almost certainly. Neither approach alone covers the full spectrum of intelligence. The interesting research question is how to combine them — how do you build a system where an LLM can delegate spatial reasoning to an EBM, or where an EBM can request linguistic clarification from an LLM?
+
+That integration layer is what nobody has figured out yet. The individual components are impressive, but the architecture for combining them is still an open problem.
+
+❯ Good overview. I think I also saw something about this from Anthropic's research blog — https://www.anthropic.com/research — though I can't find the specific post.
+
+● I'd be happy to help you track that down if you remember any keywords. Anthropic has published work on mechanistic interpretability that touches on how different types of reasoning manifest in neural networks, which is adjacent to the EBM conversation.
+
+The broader point stands though: we're moving toward hybrid architectures. Pure language models are powerful but have fundamental blind spots. The next leap likely comes from combining modalities of reasoning, not from scaling any single approach further.

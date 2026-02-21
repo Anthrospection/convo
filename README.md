@@ -1,111 +1,102 @@
-# ConvoFormatter
+# convo
 
-Convert raw Claude Code conversation transcripts (`.txt`) into clean, formatted documents — PDF, HTML, Markdown, or plain text. Strips tool calls, progress spinners, and other scaffolding noise automatically.
+Save conversations as clean, formatted documents.
+
+**convo** converts raw Claude Code conversation transcripts into readable Markdown, HTML, PDF, or plain text — stripping tool calls, progress spinners, and scaffolding noise.
 
 ## Install
 
 ```bash
-# Activate the existing virtualenv first
-source .venv/bin/activate
+# Clone and run with uv (no install needed)
+git clone https://github.com/StaceyErin44/convo.git
+cd convo
+uv run convo examples/basic.txt output.md
 
-# Install
-pip install -e .
-
-# With optional privacy/PII redaction support
-pip install -e ".[private]"
-python -m spacy download en_core_web_lg
+# Or install globally
+pip install .
+convo examples/basic.txt output.md
 ```
 
 ## Usage
 
-```
-convoformat [OPTIONS] INPUT_FILE [OUTPUT_FILE]
-```
-
-If `OUTPUT_FILE` is omitted the result is written next to `INPUT_FILE` with the appropriate extension.
-
 ```bash
-# Dark-theme mobile PDF (default)
-convoformat Conversation.txt
+# Markdown (default)
+convo transcript.txt
 
-# All options
-convoformat Conversation.txt output/Conversation.pdf \
-  --output=pdf \
-  --theme=dark \
-  --mobile \
-  --assistant="Elliot" \
-  --user="Stacey" \
-  --title="Steves All the Way Down" \
-  --date="2026-02-18"
+# HTML with dark theme
+convo transcript.txt output.html -o html
 
-# HTML for sharing
-convoformat Conversation.txt --output=html --theme=dark
+# PDF
+convo transcript.txt output.pdf -o pdf
 
-# Markdown for Obsidian
-convoformat Conversation.txt --output=markdown --assistant="Elliot" --user="Stacey"
+# With custom speaker labels
+convo transcript.txt --assistant "Claude" --user "Alex"
 
-# Plain text
-convoformat Conversation.txt --output=text
+# With YouTube references (resolves title, channel, duration)
+convo transcript.txt --ref "https://youtube.com/watch?v=VIDEO_ID"
 
-# Privacy-redacted (requires [private] extra)
-convoformat Conversation.txt --output=html --private
+# Skip AI title generation
+convo transcript.txt --no-ai
 ```
+
+## Features
+
+- **Noise stripping**: Tool calls, progress lines (`✻ Baked for 43s`), slash commands, and scaffolding are removed automatically
+- **Speaker labels**: Configurable names for AI and human turns
+- **YouTube references**: `--ref` flag resolves video metadata via yt-dlp and appends a References section
+- **AI title generation**: When no title is provided, generates one using a local Ollama model
+- **Themes**: Dark (default) and light themes for HTML and PDF output
+- **Mobile layout**: `--mobile` flag optimizes PDF/HTML for phone screens
+- **PII redaction**: `--private` flag redacts names, keys, SSNs, and other PII
+- **Config file**: Set defaults in `~/.config/convo/config.yaml`
+
+## Config
+
+Create `~/.config/convo/config.yaml` to set defaults:
+
+```yaml
+assistant: Claude
+user: Alex
+output: markdown
+theme: dark
+```
+
+CLI flags always override config values.
 
 ## Options
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--output`, `-o` | `pdf` | Output format: `pdf`, `html`, `markdown`, `text` |
-| `--theme` | `dark` | Visual theme: `dark`, `light` (pdf and html only) |
-| `--mobile` | off | Optimize layout for ~390pt mobile width |
-| `--private` | off | Apply PII redaction (always prints a warning) |
-| `--title` | auto | Override auto-detected title |
-| `--date` | auto | Override auto-detected date |
-| `--assistant` | `Assistant` | Label for AI speaker turns |
-| `--user` | `User` | Label for human speaker turns |
-| `--verbose` | off | Include tool calls and scaffolding in output |
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-o`, `--output` | Format: markdown, html, pdf, text | markdown |
+| `--theme` | dark or light (html/pdf only) | dark |
+| `--mobile` | Mobile-optimized layout | off |
+| `--private` | PII redaction | off |
+| `--title TEXT` | Override auto-generated title | auto |
+| `--date TEXT` | Override auto-detected date | auto |
+| `--assistant TEXT` | AI speaker label | Assistant |
+| `--user TEXT` | Human speaker label | User |
+| `--ref URL` | Add reference URL (repeatable) | none |
+| `--no-ai` | Skip local model features | off |
+| `--verbose` | Include tool calls in output | off |
 
-`--theme` and `--mobile` are silently ignored for `markdown` and `text` formats (a notice is printed to stderr).
+## Input Format
 
-## Privacy Mode
+convo parses Claude Code terminal output. It expects:
+- `❯ ` prefix for user turns
+- `● ` prefix for assistant turns
+- Standard Claude Code scaffolding (tool calls, progress, etc.)
 
-`--private` runs two layers of redaction:
-1. **Regex**: API keys, Bearer tokens, passwords, SSNs, credit card numbers
-2. **Presidio NLP** (requires `[private]` extra): names, organizations, locations, emails, phone numbers
+## Requirements
 
-A warning with a redaction summary is always printed to stderr. Redaction is best-effort — always review output before sharing.
+- Python 3.13+
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) (for `--ref` YouTube resolution)
+- [Ollama](https://ollama.ai) with a model like gemma3:27b (for title generation)
 
-## Development
-
+Optional:
 ```bash
-# Run tests
-pytest
-
-# Run a single test file
-pytest tests/test_parser.py
-
-# Lint
-ruff check .
-ruff check --fix .
+pip install convo[private]  # PII redaction (presidio + spacy)
 ```
 
-## Architecture
+## License
 
-```
-convoformat/
-├── cli.py          # Click entry point, orchestrates parse → redact → render
-├── parser.py       # Two-pass parser: line classification → Turn assembly
-├── privacy.py      # Regex + Presidio PII redaction
-├── renderers/
-│   ├── pdf.py      # ReportLab PDF with background color and styled turns
-│   ├── html.py     # Jinja2 single-file HTML
-│   ├── markdown.py # Plain Markdown
-│   └── text.py     # Plain text
-├── themes/
-│   ├── dark.py     # Default dark theme
-│   └── light.py    # Light theme
-└── templates/
-    └── conversation.html.j2
-```
-
-The parser produces `Turn(speaker, paragraphs, speaker_label)` objects. Scaffolding (tool calls, `⎿` output, `✻ ... for Xs` progress) is discarded in normal mode and included in `--verbose` mode.
+MIT

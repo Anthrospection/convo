@@ -10,7 +10,7 @@ import re
 import sys
 from dataclasses import dataclass
 
-from convoformat.parser import Turn
+from convo.parser import Turn
 
 # ── Layer 1: regex patterns ────────────────────────────────────────────────
 
@@ -62,7 +62,7 @@ def _load_presidio_engines():
     except ImportError:
         print(
             "\n⚠  --private requires the 'private' extra:\n"
-            "   pip install convoformat[private]\n"
+            "   pip install convo[private]\n"
             "   python -m spacy download en_core_web_lg\n",
             file=sys.stderr,
         )

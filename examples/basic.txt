@@ -1,0 +1,73 @@
+╭────────────────────────────────────────────╮
+│ ✻ Claude Code                    /home/user │
+│   Model: claude-opus-4-6                    │
+╰────────────────────────────────────────────╯
+
+❯ Can you help me understand how Python decorators work? I keep getting confused by the syntax.
+
+● Sure! A decorator is just a function that takes another function as input and returns a modified version of it. The @ syntax is syntactic sugar.
+
+Here's the simplest example:
+
+def my_decorator(func):
+    def wrapper():
+        print("Before the function runs")
+        func()
+        print("After the function runs")
+    return wrapper
+
+@my_decorator
+def say_hello():
+    print("Hello!")
+
+When you call say_hello(), it actually runs wrapper(), which calls the original say_hello() in between the print statements.
+
+The key insight: @my_decorator above def say_hello() is exactly the same as writing say_hello = my_decorator(say_hello).
+
+❯ Oh! So the @ is just shorthand for reassigning the function name?
+
+● Exactly. That's all it is. The decorator pattern has three steps:
+
+1. Take a function as input
+2. Define a new function (the wrapper) that adds behavior
+3. Return the wrapper
+
+The @ syntax just hides step 3 — the reassignment.
+
+This is why decorators can stack:
+
+@decorator_one
+@decorator_two
+def my_func():
+    pass
+
+That's the same as: my_func = decorator_one(decorator_two(my_func))
+
+They apply bottom-up.
+
+❯ What about decorators that take arguments, like @app.route("/path")?
+
+● That's where it gets one level deeper. When a decorator takes arguments, you actually have a decorator *factory* — a function that returns a decorator.
+
+def route(path):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            print(f"Handling route: {path}")
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+@route("/home")
+def index():
+    return "Welcome!"
+
+Three nested functions:
+- route("/home") — the factory, called with the argument
+- decorator — returned by the factory, receives the function
+- wrapper — the actual replacement function
+
+It's functions all the way down.
+
+❯ Functions all the way down — I like that. Thanks, this actually makes sense now.
+
+● Glad it clicked! The mental model is: decorators are just function transformation. Everything else is syntax convenience. Once you see through the @ sugar, there's nothing magical happening.

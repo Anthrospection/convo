@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from convoformat.parser import Turn
-from convoformat.references import Reference
+from convo.parser import Turn
+from convo.references import Reference
 
 
 def render_markdown(
@@ -46,7 +46,8 @@ def render_markdown(
         lines.append("## References")
         lines.append("")
         for ref in references:
-            parts = [f"- [{ref.title}]({ref.url})"]
+            safe_title = ref.title.replace("[", "\\[").replace("]", "\\]")
+            parts = [f"- [{safe_title}]({ref.url})"]
             meta = []
             if ref.channel:
                 meta.append(ref.channel)

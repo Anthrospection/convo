@@ -7,7 +7,7 @@ import re
 import subprocess
 from dataclasses import dataclass
 
-from convoformat.parser import Turn
+from convo.parser import Turn
 
 # Match YouTube URLs in various forms
 _YT_RE = re.compile(

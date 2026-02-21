@@ -1,4 +1,4 @@
-from convoformat.themes import Theme
+from convo.themes import Theme
 
 LIGHT = Theme(
     page_bg="#ffffff",

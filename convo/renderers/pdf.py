@@ -9,8 +9,8 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.platypus import HRFlowable, Paragraph, SimpleDocTemplate, Spacer
 
-from convoformat.parser import Turn
-from convoformat.themes import Theme
+from convo.parser import Turn
+from convo.themes import Theme
 
 # Mobile page dimensions in points (~390px wide, tall enough for reading)
 MOBILE_SIZE = (390, 700)
