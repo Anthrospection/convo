@@ -3,7 +3,3 @@ __pycache__/
 .venv/
 .DS_Store
 ._*
-output/
-processed/
-input/
-uv.lock
