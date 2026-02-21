@@ -8,7 +8,7 @@ Save conversations as clean, formatted documents.
 
 ```bash
 # Clone and run with uv (no install needed)
-git clone https://github.com/StaceyErin44/convo.git
+git clone https://github.com/Anthrospection/convo.git
 cd convo
 uv run convo examples/basic.txt output.md
 
