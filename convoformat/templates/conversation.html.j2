@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title | e }}</title>
+  <style>
+    :root {
+      --page-bg:    {{ theme.page_bg }};
+      --asst-label: {{ theme.assistant_label }};
+      --user-label: {{ theme.user_label }};
+      --asst-text:  {{ theme.assistant_text }};
+      --user-text:  {{ theme.user_text }};
+      --title-col:  {{ theme.title_color }};
+      --hr-col:     {{ theme.hr_color }};
+      --sub-col:    {{ theme.subtitle_color }};
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--page-bg);
+      color: var(--asst-text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      font-size: {{ "17px" if mobile else "15px" }};
+      line-height: 1.65;
+      padding: {{ "16px" if mobile else "32px" }};
+    }
+
+    .container {
+      max-width: {{ "390px" if mobile else "720px" }};
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    .header {
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--hr-col);
+    }
+
+    h1 {
+      color: var(--title-col);
+      font-size: {{ "1.5em" if mobile else "1.75em" }};
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .meta {
+      color: var(--sub-col);
+      font-size: 0.8em;
+    }
+
+    /* ── Turns ── */
+    .turn { margin-bottom: 0; }
+
+    .speaker-label {
+      font-size: 0.75em;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 5px;
+      margin-top: 20px;
+    }
+
+    .speaker-label.assistant { color: var(--asst-label); }
+    .speaker-label.user      { color: var(--user-label); }
+
+    .turn-content p {
+      margin-bottom: 0.75em;
+    }
+
+    .turn-content p:last-child { margin-bottom: 0; }
+
+    .turn.assistant .turn-content { color: var(--asst-text); }
+    .turn.user      .turn-content { color: var(--user-text); }
+
+    .turn-content .inner-hr {
+      border: none;
+      border-top: 1px solid var(--hr-col);
+      opacity: 0.25;
+      margin: 10px 0;
+    }
+
+    /* Divider between turns */
+    .turn-divider {
+      border: none;
+      border-top: 1px solid var(--hr-col);
+      opacity: 0.12;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>{{ title | e }}</h1>
+    <div class="meta">{{ date | e }} &middot; {{ assistant_label | e }} &amp; {{ user_label | e }}</div>
+  </div>
+
+  {% for turn in turns %}
+  <div class="turn {{ turn.speaker }}">
+    <div class="speaker-label {{ turn.speaker }}">
+      {%- if turn.speaker == "assistant" %}● {{ turn.speaker_label | e }}
+      {%- else %}❯ {{ turn.speaker_label | e }}{% endif %}
+    </div>
+    <div class="turn-content">
+      {% for para in turn.paragraphs %}
+        {%- if para == "---" %}<hr class="inner-hr">
+        {%- else %}<p>{{ para | e }}</p>
+        {%- endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% if not loop.last %}<hr class="turn-divider">{% endif %}
+  {% endfor %}
+
+</div>
+</body>
+</html>

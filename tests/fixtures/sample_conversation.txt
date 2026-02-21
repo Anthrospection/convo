@@ -1,0 +1,35 @@
+    ✻
+    |
+   ▟█▙     Claude Code v2.1.50
+ ▐▛███▜▌   Opus 4.6 · Claude Max
+▝▜█████▛▘  /home/elliot
+  ▘▘ ▝▝
+
+❯ Hello, what can you help me with today?
+
+● I can help you with a wide range of tasks.
+
+  Let me know what you need!
+
+● Bash(echo "hello")
+⎿ hello
+
+✻ Baked for 2s
+
+❯ Great. Can you explain something complex?
+
+  I have a follow-up question too.
+
+● Searched for 2 patterns, read 1 file (ctrl+o to expand)
+
+● Sure, here is a complex explanation.
+
+  ---
+
+  First point: this is important context.
+
+  Second point: this builds on the first.
+
+❯ Thank you, that helps a lot.
+
+● You're welcome. sk-abc123def456ghi789jkl Let me know if you need anything else.
