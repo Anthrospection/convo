@@ -1,7 +1,7 @@
 [project]
 name = "convo"
 version = "0.2.0"
-description = "Save conversations as clean, formatted documents"
+description = "Save AI coding conversations as clean Markdown, HTML, or PDF"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

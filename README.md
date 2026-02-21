@@ -1,8 +1,8 @@
 # convo
 
-Save conversations as clean, formatted documents.
+Save AI coding conversations as clean Markdown, HTML, or PDF.
 
-**convo** converts raw Claude Code conversation transcripts into readable Markdown, HTML, PDF, or plain text — stripping tool calls, progress spinners, and scaffolding noise.
+**convo** converts Claude Code conversation transcripts into readable documents — stripping tool calls, progress spinners, and scaffolding noise. Just the conversation, formatted for humans.
 
 ## Install
 
@@ -89,13 +89,11 @@ convo parses Claude Code terminal output. It expects:
 ## Requirements
 
 - Python 3.13+
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) (for `--ref` YouTube resolution)
-- [Ollama](https://ollama.ai) with a model like gemma3:27b (for title generation)
 
-Optional:
-```bash
-pip install convo[private]  # PII redaction (presidio + spacy)
-```
+**Optional (enhances but not required):**
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) — resolves YouTube metadata for `--ref`
+- [Ollama](https://ollama.ai) — generates titles from conversation content (falls back to filename without it)
+- `pip install convo[private]` — PII redaction via presidio + spacy
 
 ## License
 
